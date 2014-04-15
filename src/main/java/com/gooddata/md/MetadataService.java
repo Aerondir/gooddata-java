@@ -8,6 +8,8 @@ import com.gooddata.gdc.UriResponse;
 import com.gooddata.project.Project;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Collection;
+
 /**
  */
 public class MetadataService extends AbstractService {
@@ -28,5 +30,9 @@ public class MetadataService extends AbstractService {
     public <T extends Obj> T createObj(Project project, T obj) {
         final UriResponse response = restTemplate.postForObject(Obj.URI, obj, UriResponse.class, project.getId());
         return getObjByUri(response.getUri(), (Class<T>) obj.getClass());
+    }
+
+    public Collection<Query.Entry> query(Project project, String type) {
+        return restTemplate.getForObject(Query.URI, Query.class, project.getId(), type).getEntries();
     }
 }
