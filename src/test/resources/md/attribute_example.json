@@ -1,0 +1,56 @@
+{
+    "attribute" : {
+      "content" : {
+         "pk" : [
+            {
+               "data" : "/gdc/md/{project-id}/obj/9",
+               "type" : "col"
+            }
+         ],
+         "displayForms" : [
+            {
+               "content" : {
+                  "formOf" : "/gdc/md/{project-id}/obj/49",
+                  "expression" : "[/gdc/md/{project-id}/obj/11]",
+                  "ldmexpression" : ""
+               },
+               "links" : {
+                  "elements" : "/gdc/md/{project-id}/obj/50/elements"
+               },
+               "meta" : {
+                  "author" : "/gdc/account/profile/{user-id}",
+                  "uri" : "/gdc/md/{project-id}/obj/50",
+                  "tags" : "",
+                  "created" : "2014-02-26 01:35:22",
+                  "identifier" : "label.enrolments.provider",
+                  "deprecated" : "0",
+                  "summary" : "",
+                  "title" : "Provider Code",
+                  "category" : "attributeDisplayForm",
+                  "updated" : "2014-02-26 03:46:03",
+                  "contributor" : "/gdc/account/profile/{user-id}"
+               }
+            }
+         ],
+         "fk" : [
+            {
+               "data" : "/gdc/md/{project-id}/obj/37",
+               "type" : "col"
+            }
+         ]
+      },
+      "meta" : {
+         "author" : "/gdc/account/profile/{user-id}",
+         "uri" : "/gdc/md/{project-id}/obj/49",
+         "tags" : "",
+         "created" : "2014-02-26 01:35:22",
+         "identifier" : "attr.enrolments.provider",
+         "deprecated" : "0",
+         "summary" : "",
+         "title" : "Provider Code",
+         "category" : "attribute",
+         "updated" : "2014-02-26 03:46:03",
+         "contributor" : "/gdc/account/profile/{user-id}"
+      }
+   }
+}
