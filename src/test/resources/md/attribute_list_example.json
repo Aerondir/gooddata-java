@@ -1,0 +1,34 @@
+{
+    "query": {
+        "entries": [
+            {
+                "link": "/gdc/md/mwzb9jqs8admt0obea2t2jv8wqsbfl6v/obj/271",
+                "locked": 0,
+                "author": "/gdc/account/profile/7b6217b1e87b7a9d5b1a1f66bd48b279",
+                "tags": "date week year",
+                "created": "2014-02-26 03:46:01",
+                "identifier": "date.week.in.year",
+                "deprecated": "0",
+                "summary": "Generic Week based on US Weeks (Sun-Sat)",
+                "title": "Week (Sun-Sat) (Enrolment Date)",
+                "category": "attribute",
+                "updated": "2014-02-26 03:46:02",
+                "contributor": "/gdc/account/profile/7b6217b1e87b7a9d5b1a1f66bd48b279"
+            },
+            {
+                "link": "/gdc/md/mwzb9jqs8admt0obea2t2jv8wqsbfl6v/obj/237",
+                "locked": 0,
+                "author": "/gdc/account/profile/7b6217b1e87b7a9d5b1a1f66bd48b279",
+                "tags": "date quarter year",
+                "created": "2014-02-26 03:46:01",
+                "identifier": "date.quarter.in.year",
+                "deprecated": "0",
+                "summary": "Generic Quarter (Q1-Q4)",
+                "title": "Quarter (Enrolment Date)",
+                "category": "attribute",
+                "updated": "2014-02-26 03:46:02",
+                "contributor": "/gdc/account/profile/7b6217b1e87b7a9d5b1a1f66bd48b279"
+            }
+        ]
+    }
+}

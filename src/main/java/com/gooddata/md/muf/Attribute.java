@@ -1,5 +1,7 @@
-package com.gooddata.md;
+package com.gooddata.md.muf;
 
+import com.gooddata.md.Meta;
+import com.gooddata.md.Obj;
 import org.codehaus.jackson.annotate.*;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
@@ -14,6 +16,8 @@ import java.util.Collection;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class Attribute extends Obj {
+
+    public static final String ATTRIBUTES_URI = "/gdc/md/{projectId}/query/attributes";
 
     private final Content content;
 
