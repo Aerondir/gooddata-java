@@ -1,6 +1,7 @@
 package com.gooddata.md;
 
 import com.gooddata.md.muf.Attribute;
+import com.gooddata.md.muf.AttributeElements;
 import com.gooddata.md.muf.AttributeLinks;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
@@ -26,7 +27,7 @@ public class AttributeServiceTest {
         final Meta meta = value.getMeta();
         assertNotNull(meta);
         assertEquals("Provider Code", meta.getTitle());
-        assertEquals("49",value.getId());
+        assertEquals("49", value.getId());
         final Attribute.Content content = value.getContent();
         assertNotNull(content);
         final Collection<Attribute.DisplayForm> displayForms = content.getDisplayForms();
@@ -46,5 +47,17 @@ public class AttributeServiceTest {
         assertEquals(2, entries.size());
         assertEquals("Quarter (Enrolment Date)", entries.get(1).getTitle());
         assertEquals("/gdc/md/mwzb9jqs8admt0obea2t2jv8wqsbfl6v/obj/271", entries.get(0).getLink());
+    }
+
+    @Test
+    public void testAttributeElementsMapping() throws Exception {
+        final InputStream stream = getClass().getResourceAsStream("/md/attribute_elems_example.json");
+        final AttributeElements value = new ObjectMapper().readValue(stream, AttributeElements.class);
+        assertNotNull(value);
+        assertNotNull(value.getElements());
+        final AttributeElements.ElementLinkEntry entry = value.getElements().get(0);
+        assertEquals("CQU", entry.getTitle());
+        assertEquals("3531", entry.getId());
+
     }
 }

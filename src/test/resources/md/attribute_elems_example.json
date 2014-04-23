@@ -1,0 +1,37 @@
+{
+    "attributeElements": {
+        "elementsMeta": {
+            "count": 40,
+            "mode": "includeuris",
+            "filter": "",
+            "records": "40",
+            "prompt": "",
+            "attribute": "/gdc/md/mwzb9jqs8admt0obea2t2jv8wqsbfl6v/obj/49",
+            "order": "unsorted",
+            "attributeDisplayForm": "/gdc/md/mwzb9jqs8admt0obea2t2jv8wqsbfl6v/obj/50",
+            "offset": "0"
+        },
+        "elements": [
+            {
+                "title": "CQU",
+                "uri": "/gdc/md/mwzb9jqs8admt0obea2t2jv8wqsbfl6v/obj/49/elements?id=3531"
+            },
+            {
+                "title": "CDU",
+                "uri": "/gdc/md/mwzb9jqs8admt0obea2t2jv8wqsbfl6v/obj/49/elements?id=24401"
+            },
+            {
+                "title": "USQ",
+                "uri": "/gdc/md/mwzb9jqs8admt0obea2t2jv8wqsbfl6v/obj/49/elements?id=5232"
+            },
+            {
+                "title": "SWANT",
+                "uri": "/gdc/md/mwzb9jqs8admt0obea2t2jv8wqsbfl6v/obj/49/elements?id=180932"
+            },
+            {
+                "title": "UQLD",
+                "uri": "/gdc/md/mwzb9jqs8admt0obea2t2jv8wqsbfl6v/obj/49/elements?id=26398"
+            }
+        ]
+    }
+}
