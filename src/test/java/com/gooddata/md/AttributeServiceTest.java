@@ -26,6 +26,7 @@ public class AttributeServiceTest {
         final Meta meta = value.getMeta();
         assertNotNull(meta);
         assertEquals("Provider Code", meta.getTitle());
+        assertEquals("49",value.getId());
         final Attribute.Content content = value.getContent();
         assertNotNull(content);
         final Collection<Attribute.DisplayForm> displayForms = content.getDisplayForms();

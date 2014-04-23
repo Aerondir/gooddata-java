@@ -17,8 +17,6 @@ import java.util.Collection;
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class Attribute extends Obj {
 
-    public static final String ATTRIBUTES_URI = "/gdc/md/{projectId}/query/attributes";
-
     private final Content content;
 
     @JsonCreator
@@ -27,6 +25,9 @@ public class Attribute extends Obj {
         this.content = content;
     }
 
+    public String getId() {
+        return OBJ_TEMPLATE.match(getMeta().getUri()).get("objId");
+    }
 
     public Content getContent() {
         return content;

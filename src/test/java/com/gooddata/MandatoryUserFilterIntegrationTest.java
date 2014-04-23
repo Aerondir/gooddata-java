@@ -2,19 +2,19 @@ package com.gooddata;
 
 import com.gooddata.account.Account;
 import com.gooddata.account.AccountService;
-import com.gooddata.dataset.DatasetManifest;
-import com.gooddata.dataset.DatasetService;
-import com.gooddata.model.ModelService;
+import com.gooddata.md.muf.Attribute;
+import com.gooddata.md.muf.AttributeLinks;
+import com.gooddata.md.muf.FilterService;
 import com.gooddata.project.Project;
 import com.gooddata.project.ProjectService;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.NoSuchElementException;
 import java.util.Properties;
 
-public class ProjectIntegrationTest {
+public class MandatoryUserFilterIntegrationTest {
 
     public static void main(String[] args) throws IOException {
         final Properties prop = new Properties();
@@ -34,7 +34,11 @@ public class ProjectIntegrationTest {
         final Project project = gd.getProjectService().getProjectById("mwzb9jqs8admt0obea2t2jv8wqsbfl6v");
         System.out.println("project.getMeta().getTitle() = " + project.getMeta().getTitle());
 
-
+        final FilterService filterService = gd.getFilterService();
+        final Collection<AttributeLinks.AttributeLinkEntry> attributeList = filterService.getAttributeList(project.getId());
+        final AttributeLinks.AttributeLinkEntry linkEntry = attributeList.stream().filter(el -> el.getTitle().equals("Provider Code")).findFirst().orElseThrow(NoSuchElementException::new);
+        final Attribute attribute = filterService.getAttribute(linkEntry.getLink());
+        final String attributeId = attribute.getId();
 
     }
 }

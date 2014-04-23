@@ -3,6 +3,8 @@ package com.gooddata.md.muf;
 import com.gooddata.AbstractService;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Collection;
+
 /**
  * Created Date: 23/04/2014
  */
@@ -12,8 +14,12 @@ public class FilterService extends AbstractService {
         super(restTemplate);
     }
 
-    public AttributeLinks getAttributeList(String projectId) {
+    public Collection<AttributeLinks.AttributeLinkEntry> getAttributeList(String projectId) {
         final AttributeLinks attributes = restTemplate.getForObject(AttributeLinks.URI, AttributeLinks.class, projectId);
-        return attributes;
+        return attributes.getEntries();
+    }
+
+    public Attribute getAttribute(String link) {
+        return restTemplate.getForObject(link, Attribute.class);
     }
 }
