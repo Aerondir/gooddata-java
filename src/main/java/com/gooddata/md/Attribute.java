@@ -6,8 +6,6 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import static java.util.Arrays.asList;
-
 /**
  * Created Date: 22/04/2014
  */
@@ -25,12 +23,6 @@ public class Attribute extends Obj {
         this.content = content;
     }
 
-/*
-    public Attribute(String title, Collection<DisplayForm> displayForms) {
-        this(new Meta(title), new Content(displayForms));
-
-    }
-*/
 
     public Content getContent() {
         return content;
@@ -40,14 +32,46 @@ public class Attribute extends Obj {
     @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
     public static class Content {
 
-        @JsonProperty("pk")
-        Collection<Totals> totals = new ArrayList<>();
+        Collection<DisplayForm> displayForms = new ArrayList<>();
+
+        @JsonCreator
+        public Content(@JsonProperty("displayForms") Collection<DisplayForm> displayForms) {
+            this.displayForms = displayForms;
+        }
+
+        public Collection<DisplayForm> getDisplayForms() {
+            return displayForms;
+        }
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
-    public static class Totals {
-        @JsonProperty("data")
-        String data;
+    public static class DisplayForm {
+
+        private Links links;
+
+        @JsonCreator
+        public DisplayForm(@JsonProperty("links") Links links) {
+            this.links = links;
+        }
+
+        public Links getLinks() {
+            return links;
+        }
+
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+        public static class Links {
+            private final String elements;
+
+            @JsonCreator
+            public Links(@JsonProperty("elements") String elements) {
+                this.elements = elements;
+            }
+
+            public String getElements() {
+                return elements;
+            }
+        }
     }
 }
