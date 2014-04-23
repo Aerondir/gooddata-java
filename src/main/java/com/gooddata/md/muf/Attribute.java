@@ -6,7 +6,7 @@ import org.codehaus.jackson.annotate.*;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 /**
  * Created Date: 22/04/2014
@@ -29,6 +29,10 @@ public class Attribute extends Obj {
         return OBJ_TEMPLATE.match(getMeta().getUri()).get("objId");
     }
 
+    public String getElementsUri() {
+        return getContent().getDisplayForms().get(0).getLinks().getElements();
+    }
+
     public Content getContent() {
         return content;
     }
@@ -37,16 +41,18 @@ public class Attribute extends Obj {
     @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
     public static class Content {
 
-        Collection<DisplayForm> displayForms = new ArrayList<>();
+        List<DisplayForm> displayForms = new ArrayList<>();
 
         @JsonCreator
-        public Content(@JsonProperty("displayForms") Collection<DisplayForm> displayForms) {
+        public Content(@JsonProperty("displayForms") List<DisplayForm> displayForms) {
             this.displayForms = displayForms;
         }
 
-        public Collection<DisplayForm> getDisplayForms() {
+        public List<DisplayForm> getDisplayForms() {
             return displayForms;
         }
+
+
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)

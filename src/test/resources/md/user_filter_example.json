@@ -1,0 +1,42 @@
+{
+  "userFilter" : {
+    "content" : {
+      "tree" : {
+        "content" : [ {
+          "value" : "/gdc/md/mwzb9jqs8admt0obea2t2jv8wqsbfl6v/obj/49",
+          "position" : {
+            "column" : 1,
+            "line" : 2
+          },
+          "type" : "attribute object"
+        }, {
+          "value" : "/gdc/md/mwzb9jqs8admt0obea2t2jv8wqsbfl6v/obj/49/elements?id=54",
+          "position" : {
+            "column" : 51,
+            "line" : 2
+          },
+          "type" : "attributeElement object"
+        } ],
+        "position" : {
+          "column" : 50,
+          "line" : 2
+        },
+        "type" : "="
+      },
+      "expression" : "[/gdc/md/mwzb9jqs8admt0obea2t2jv8wqsbfl6v/obj/49]=[/gdc/md/mwzb9jqs8admt0obea2t2jv8wqsbfl6v/obj/49/elements?id=54]"
+    },
+    "meta" : {
+      "author" : "/gdc/account/profile/7b6217b1e87b7a9d5b1a1f66bd48b279",
+      "uri" : "/gdc/md/mwzb9jqs8admt0obea2t2jv8wqsbfl6v/obj/83",
+      "tags" : "",
+      "created" : "2014-02-26 02:50:40",
+      "identifier" : "asL6bR5Oft72",
+      "deprecated" : "0",
+      "summary" : "",
+      "title" : "Provider is MON",
+      "category" : "userFilter",
+      "updated" : "2014-02-26 02:50:40",
+      "contributor" : "/gdc/account/profile/7b6217b1e87b7a9d5b1a1f66bd48b279"
+    }
+  }
+}

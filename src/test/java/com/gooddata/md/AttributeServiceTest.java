@@ -3,11 +3,11 @@ package com.gooddata.md;
 import com.gooddata.md.muf.Attribute;
 import com.gooddata.md.muf.AttributeElements;
 import com.gooddata.md.muf.AttributeLinks;
+import com.gooddata.md.muf.UserFilter;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
 
 import java.io.InputStream;
-import java.util.Collection;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -30,11 +30,10 @@ public class AttributeServiceTest {
         assertEquals("49", value.getId());
         final Attribute.Content content = value.getContent();
         assertNotNull(content);
-        final Collection<Attribute.DisplayForm> displayForms = content.getDisplayForms();
+        final List<Attribute.DisplayForm> displayForms = content.getDisplayForms();
         assertNotNull(displayForms);
         assertEquals(1, displayForms.size());
-        final String elements = ((List<Attribute.DisplayForm>) displayForms).get(0).getLinks().getElements();
-        assertEquals("/gdc/md/{project-id}/obj/50/elements", elements);
+        assertEquals("/gdc/md/{project-id}/obj/50/elements", value.getElementsUri());
     }
 
     @Test
@@ -50,6 +49,14 @@ public class AttributeServiceTest {
     }
 
     @Test
+    public void testFilterMapping() throws Exception {
+        final InputStream stream = getClass().getResourceAsStream("/md/user_filter_example.json");
+        final UserFilter value = new ObjectMapper().readValue(stream, UserFilter.class);
+        assertNotNull(value);
+
+    }
+
+    @Test
     public void testAttributeElementsMapping() throws Exception {
         final InputStream stream = getClass().getResourceAsStream("/md/attribute_elems_example.json");
         final AttributeElements value = new ObjectMapper().readValue(stream, AttributeElements.class);
@@ -60,4 +67,5 @@ public class AttributeServiceTest {
         assertEquals("3531", entry.getId());
 
     }
+
 }

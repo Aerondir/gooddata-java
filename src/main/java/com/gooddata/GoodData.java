@@ -11,7 +11,7 @@ import com.gooddata.http.client.GoodDataHttpClient;
 import com.gooddata.http.client.LoginSSTRetrievalStrategy;
 import com.gooddata.http.client.SSTRetrievalStrategy;
 import com.gooddata.md.MetadataService;
-import com.gooddata.md.muf.FilterService;
+import com.gooddata.md.muf.UserFilterService;
 import com.gooddata.model.ModelService;
 import com.gooddata.project.ProjectService;
 import com.gooddata.report.ReportService;
@@ -48,7 +48,7 @@ public class GoodData {
     private final DataStoreService dataStoreService;
     private final DatasetService datasetService;
     private final ReportService reportService;
-    private final FilterService filterService;
+    private final UserFilterService filterService;
 
     public GoodData(String login, String password) {
         this(HOSTNAME, login, password);
@@ -67,7 +67,7 @@ public class GoodData {
         dataStoreService = new DataStoreService(httpClientBuilder, gdcService, login, password);
         datasetService = new DatasetService(restTemplate, dataStoreService);
         reportService = new ReportService(restTemplate);
-        filterService = new FilterService(restTemplate);
+        filterService = new UserFilterService(restTemplate, metadataService);
     }
 
     private RestTemplate createRestTemplate(String hostname, String login, String password, HttpClientBuilder httpClientBuilder) {
@@ -134,7 +134,7 @@ public class GoodData {
     public ReportService getReportService() {
         return reportService;
     }
-    public FilterService getFilterService() {
+    public UserFilterService getFilterService() {
         return filterService;
     }
 
