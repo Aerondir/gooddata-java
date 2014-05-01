@@ -21,5 +21,6 @@ public class AttributeDisplayFormTest {
         assertThat(content.getExpression(), is("[/gdc/md/vra1wg1m6r0gzl8i8r8y3h1bk0kkzkpo/obj/17]"));
         assertThat(content.getDefaultValue(), is("0"));
         assertThat(content.getLdmexpression(), is(""));
+        assertThat(value.getLinks().getElements(), is("/gdc/md/vra1wg1m6r0gzl8i8r8y3h1bk0kkzkpo/obj/29/elements"));
     }
 }

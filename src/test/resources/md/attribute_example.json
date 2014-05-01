@@ -12,6 +12,7 @@
                "content" : {
                   "formOf" : "/gdc/md/{project-id}/obj/49",
                   "expression" : "[/gdc/md/{project-id}/obj/11]",
+                   "default" : 0,
                   "ldmexpression" : ""
                },
                "links" : {

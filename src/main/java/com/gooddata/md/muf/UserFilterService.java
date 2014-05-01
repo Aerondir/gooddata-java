@@ -1,6 +1,8 @@
 package com.gooddata.md.muf;
 
 import com.gooddata.AbstractService;
+import com.gooddata.md.Attribute;
+import com.gooddata.md.Entry;
 import com.gooddata.md.MetadataService;
 import com.gooddata.project.Project;
 import org.springframework.web.client.RestTemplate;
@@ -19,9 +21,8 @@ public class UserFilterService extends AbstractService {
         this.metadataService = metadataService;
     }
 
-    public Collection<AttributeLinks.AttributeLinkEntry> getAttributeList(String projectId) {
-        final AttributeLinks attributes = restTemplate.getForObject(AttributeLinks.URI, AttributeLinks.class, projectId);
-        return attributes.getEntries();
+    public Collection<Entry> getAttributeList(Project project) {
+        return metadataService.find(project, Attribute.class);
     }
 
     public Attribute getAttribute(String link) {

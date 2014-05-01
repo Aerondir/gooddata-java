@@ -5,7 +5,6 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.springframework.web.util.UriTemplate;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -39,9 +38,6 @@ public class AttributeElements {
         @JsonProperty("uri")
         String uri;
         
-        public String getId() {
-                return TEMPLATE.match(getUri()).get("elementId");
-            }
         @JsonCreator
         public ElementLinkEntry(@JsonProperty("title") String title, @JsonProperty("uri") String uri) {
             this.title = title;

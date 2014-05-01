@@ -16,11 +16,17 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 public class DisplayForm extends Obj {
 
     private final Content content;
+    private Links links;
 
     @JsonCreator
-    public DisplayForm(@JsonProperty("meta") Meta meta, @JsonProperty("content") Content content) {
+    public DisplayForm(@JsonProperty("meta") Meta meta, @JsonProperty("content") Content content, @JsonProperty("links")Links links) {
         super(meta);
         this.content = content;
+        this.links = links;
+    }
+
+    public Links getLinks() {
+        return links;
     }
 
     public Content getContent() {
@@ -60,6 +66,21 @@ public class DisplayForm extends Obj {
 
         public String getLdmexpression() {
             return ldmexpression;
+        }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+    public static class Links {
+        private final String elements;
+
+        @JsonCreator
+        public Links(@JsonProperty("elements") String elements) {
+            this.elements = elements;
+        }
+
+        public String getElements() {
+            return elements;
         }
     }
 

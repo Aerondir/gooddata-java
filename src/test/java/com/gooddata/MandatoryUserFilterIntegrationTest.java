@@ -2,17 +2,19 @@ package com.gooddata;
 
 import com.gooddata.account.Account;
 import com.gooddata.account.AccountService;
+import com.gooddata.md.Attribute;
+import com.gooddata.md.DisplayForm;
 import com.gooddata.md.MetadataService;
-import com.gooddata.md.muf.Attribute;
-import com.gooddata.md.muf.AttributeLinks;
+import com.gooddata.md.Restriction;
 import com.gooddata.md.muf.UserFilter;
 import com.gooddata.md.muf.UserFilterService;
 import com.gooddata.project.Project;
 import com.gooddata.project.ProjectService;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.NoSuchElementException;
+import java.util.List;
 
 public class MandatoryUserFilterIntegrationTest {
 
@@ -32,18 +34,20 @@ public class MandatoryUserFilterIntegrationTest {
         final Project project = gd.getProjectService().getProjectById("mwzb9jqs8admt0obea2t2jv8wqsbfl6v");
         System.out.println("project.getMeta().getTitle() = " + project.getMeta().getTitle());
 
+        final MetadataService metadataService = gd.getMetadataService();
+
         final UserFilterService filterService = gd.getFilterService();
-        final Collection<AttributeLinks.AttributeLinkEntry> attributeList = filterService.getAttributeList(project.getId());
-        final AttributeLinks.AttributeLinkEntry linkEntry = attributeList.stream().filter(el -> el.getTitle().equals("Provider Code")).findFirst().orElseThrow(NoSuchElementException::new);
-        final Attribute attribute = filterService.getAttribute(linkEntry.getLink());
-        final String attributeUri = attribute.getMeta().getUri();
+        final String attributeUri = metadataService.getObjUri(project, Attribute.class, Restriction.title("Provider Code"));
         System.out.println("attributeUri = " + attributeUri);
-        final String elementsUri = attribute.getElementsUri();
+
+        final Attribute attribute = metadataService.getObjByUri(attributeUri, Attribute.class);
+        final List<DisplayForm> displayForms = new ArrayList<>(attribute.getContent().getDisplayForms());
+        final String elementsUri = displayForms.get(0).getLinks().getElements();
         System.out.println("elementsUri = " + elementsUri);
+
         final String valueUri = filterService.getElements(elementsUri).stream().filter(el -> el.getTitle().equals("CQU")).map(el -> el.getUri()).findFirst().orElse("");
         System.out.println("valueUri = " + valueUri);
 
-        final MetadataService metadataService = gd.getMetadataService();
         final UserFilter userFilter = filterService.createFilter("testFilter2", project, attributeUri, valueUri);
         System.out.println("userFilter = " + userFilter.getMeta().getUri());
 
