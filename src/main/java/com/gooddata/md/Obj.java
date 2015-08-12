@@ -1,26 +1,15 @@
-/*
- * Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
- */
 package com.gooddata.md;
 
-import org.codehaus.jackson.annotate.JsonProperty;
 import org.springframework.web.util.UriTemplate;
 
 /**
- * Metadata object
+ * First class metadata object - only dto objects, which have URI pointing to themselves should implement this.
  */
-public abstract class Obj {
-    public static final String URI = "/gdc/md/{projectId}/obj";
-    public static final String OBJ_URI = URI + "/{objId}";
-    public static final UriTemplate OBJ_TEMPLATE = new UriTemplate(OBJ_URI);
+public interface Obj {
 
-    protected final Meta meta;
+    String URI = "/gdc/md/{projectId}/obj";
+    String OBJ_URI = URI + "/{objId}";
+    UriTemplate OBJ_TEMPLATE = new UriTemplate(OBJ_URI);
 
-    public Obj(@JsonProperty("meta") Meta meta) {
-        this.meta = meta;
-    }
-
-    public Meta getMeta() {
-        return meta;
-    }
+    String getUri();
 }

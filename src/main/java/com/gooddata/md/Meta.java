@@ -3,50 +3,52 @@
  */
 package com.gooddata.md;
 
+import com.gooddata.util.*;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.joda.time.DateTime;
 
 import java.io.Serializable;
 
 /**
- * Metadata meta information
+ * Metadata meta information (meant just for internal SDK usage)
  */
-@JsonIgnoreProperties(ignoreUnknown=true)
-@JsonSerialize(include=Inclusion.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonSerialize(include = Inclusion.NON_NULL)
 public class Meta implements Serializable {
 
     private String author;
     private String contributor;
-    private String created;
+    private DateTime created;
+    private DateTime updated;
     private String summary;
-    private String updated;
     private String category;
-    private String tags;
+    private String tags; //TODO collection
     private String uri;
-    private String deprecated;
+    private boolean deprecated;
     private String title;
     private String identifier;
-    private String projectTemplate;
-    private Integer locked;
+    private boolean locked;
+    private boolean unlisted;
 
     @JsonCreator
-    public Meta(@JsonProperty("author") String author,
-            @JsonProperty("contributor") String contributor,
-            @JsonProperty("created") String created,
-            @JsonProperty("updated") String updated,
-            @JsonProperty("summary") String summary,
-            @JsonProperty("title") String title,
-            @JsonProperty("category") String category,
-            @JsonProperty("tags")String tags,
-            @JsonProperty("uri") String uri,
-            @JsonProperty("deprecated") String deprecated,
-            @JsonProperty("identifier") String identifier,
-            @JsonProperty("link") String link,
-            @JsonProperty("projectTemplate") String projectTemplate,
-            @JsonProperty("locked") Integer locked) {
+    protected Meta(@JsonProperty("author") String author,
+                   @JsonProperty("contributor") String contributor,
+                   @JsonProperty("created") @JsonDeserialize(using = GDDateTimeDeserializer.class) DateTime created,
+                   @JsonProperty("updated") @JsonDeserialize(using = GDDateTimeDeserializer.class) DateTime updated,
+                   @JsonProperty("summary") String summary,
+                   @JsonProperty("title") String title,
+                   @JsonProperty("category") String category,
+                   @JsonProperty("tags") String tags,
+                   @JsonProperty("uri") String uri,
+                   @JsonProperty("deprecated") @JsonDeserialize(using = BooleanStringDeserializer.class) boolean deprecated,
+                   @JsonProperty("identifier") String identifier,
+                   @JsonProperty("locked") @JsonDeserialize(using = BooleanIntegerDeserializer.class) boolean locked,
+                   @JsonProperty("unlisted") @JsonDeserialize(using = BooleanIntegerDeserializer.class) boolean unlisted) {
         super();
         this.author = author;
         this.uri = uri;
@@ -58,13 +60,18 @@ public class Meta implements Serializable {
         this.category = category;
         this.deprecated = deprecated;
         this.identifier = identifier;
-        this.projectTemplate = projectTemplate;
-        this.locked = locked;
         this.contributor = contributor;
+        this.locked = locked;
+        this.unlisted = unlisted;
     }
 
     public Meta(String title) {
         this.title = title;
+    }
+
+    public Meta(String title, String summary) {
+        this.title = title;
+        this.summary = summary;
     }
 
     public String getAuthor() {
@@ -75,7 +82,8 @@ public class Meta implements Serializable {
         return contributor;
     }
 
-    public String getCreated() {
+    @JsonSerialize(using = GDDateTimeSerializer.class, include = Inclusion.NON_NULL)
+    public DateTime getCreated() {
         return created;
     }
 
@@ -83,11 +91,20 @@ public class Meta implements Serializable {
         return summary;
     }
 
+    public void setSummary(String summary) {
+        this.summary = summary;
+    }
+
     public String getTitle() {
         return title;
     }
 
-    public String getUpdated() {
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    @JsonSerialize(using = GDDateTimeSerializer.class, include = Inclusion.NON_NULL)
+    public DateTime getUpdated() {
         return updated;
     }
 
@@ -95,28 +112,54 @@ public class Meta implements Serializable {
         return category;
     }
 
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
     public String getTags() {
         return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
     }
 
     public String getUri() {
         return uri;
     }
 
-    public String getDeprecated() {
+    @JsonSerialize(using = BooleanStringSerializer.class)
+    public boolean isDeprecated() {
         return deprecated;
+    }
+
+    public void setDeprecated(boolean deprecated) {
+        this.deprecated = deprecated;
     }
 
     public String getIdentifier() {
         return identifier;
     }
 
-    public String getProjectTemplate() {
-        return projectTemplate;
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
     }
 
-    public Integer getLocked() {
+    @JsonSerialize(using = BooleanIntegerSerializer.class)
+    public boolean isLocked() {
         return locked;
     }
 
+    public void setLocked(boolean locked) {
+        this.locked = locked;
+    }
+
+    @JsonSerialize(using = BooleanIntegerSerializer.class)
+    public boolean isUnlisted() {
+        return unlisted;
+    }
+
+    public void setUnlisted(boolean unlisted) {
+        this.unlisted = unlisted;
+    }
 }

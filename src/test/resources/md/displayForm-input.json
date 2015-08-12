@@ -1,0 +1,13 @@
+{
+  "content" : {
+     "formOf" : "/gdc/md/PROJECT_ID/obj/DF_FORM_OF_ID",
+     "expression" : "[/gdc/md/PROJECT_ID/obj/DF_EXPRESSION_ID]",
+     "ldmexpression" : ""
+  },
+  "meta" : {
+     "title" : "Person Name",
+	  "deprecated" : "0",
+	  "locked": 0,
+	  "unlisted": 0
+  }
+}

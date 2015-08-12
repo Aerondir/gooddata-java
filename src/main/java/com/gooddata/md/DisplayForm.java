@@ -3,46 +3,67 @@
  */
 package com.gooddata.md;
 
+import com.gooddata.util.BooleanIntegerDeserializer;
+import com.gooddata.util.BooleanIntegerSerializer;
 import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 /**
- * Display form of attribute
+ * Display form
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
-public class DisplayForm extends Obj {
+public class DisplayForm extends AbstractObj {
 
-    private final Content content;
+    @JsonProperty("content")
+    protected final Content content;
 
     @JsonCreator
-    public DisplayForm(@JsonProperty("meta") Meta meta, @JsonProperty("content") Content content) {
+    protected DisplayForm(@JsonProperty("meta") Meta meta, @JsonProperty("content") Content content) {
         super(meta);
         this.content = content;
     }
 
-    public Content getContent() {
-        return content;
+    @JsonIgnore
+    public String getFormOf() {
+        return content.getFormOf();
+    }
+
+    @JsonIgnore
+    public String getExpression() {
+        return content.getExpression();
+    }
+
+    @JsonIgnore
+    public String getLdmExpression() {
+        return content.getLdmExpression();
+    }
+
+    @JsonIgnore
+    public String getType() {
+        return content.getType();
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
-    public static class Content {
+    protected static class Content {
 
         private final String formOf;
         private final String expression;
-        private final String defaultValue;
-        private final String ldmexpression;
+        private final String ldmExpression;
+        private final String type;
 
         @JsonCreator
         public Content(@JsonProperty("formOf") String formOf, @JsonProperty("expression") String expression,
-                       @JsonProperty("default") String defaultValue, @JsonProperty("ldmexpression") String ldmexpression) {
+                       @JsonProperty("ldmexpression") String ldmExpression, @JsonProperty("type") String type) {
             this.formOf = formOf;
             this.expression = expression;
-            this.defaultValue = defaultValue;
-            this.ldmexpression = ldmexpression;
+            this.ldmExpression = ldmExpression;
+            this.type = type;
         }
 
         public String getFormOf() {
@@ -53,13 +74,13 @@ public class DisplayForm extends Obj {
             return expression;
         }
 
-        @JsonProperty("default")
-        public String getDefaultValue() {
-            return defaultValue;
+        @JsonProperty("ldmexpression")
+        public String getLdmExpression() {
+            return ldmExpression;
         }
 
-        public String getLdmexpression() {
-            return ldmexpression;
+        public String getType() {
+            return type;
         }
     }
 

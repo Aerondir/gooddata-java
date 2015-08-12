@@ -3,14 +3,13 @@
  */
 package com.gooddata.dataset;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 /**
- * TODO
+ * ETL Pull DTO (for internal use).
+ * Serialization only.
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class Pull {
 

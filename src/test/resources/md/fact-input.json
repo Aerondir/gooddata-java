@@ -1,0 +1,18 @@
+{
+    "fact" : {
+        "content" : {
+            "expr" : [
+                {
+                    "data" : "/gdc/md/PROJECT_ID/obj/COL_ID",
+                    "type" : "col"
+                }
+            ]
+        },
+        "meta" : {
+            "title" : "Person Shoe Size",
+	        "deprecated" : "0",
+	        "locked": 0,
+	        "unlisted": 0
+        }
+    }
+}

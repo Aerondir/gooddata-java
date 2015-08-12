@@ -1,7 +1,9 @@
 /*
- * Copyright (C) 2007-2014, GoodData(R) Corporation. All rights reserved.
+ * Copyright (C) 2007-2015, GoodData(R) Corporation. All rights reserved.
  */
 package com.gooddata.md;
+
+import static java.util.Arrays.asList;
 
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
@@ -10,55 +12,24 @@ import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.annotate.JsonTypeName;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-import java.util.Collection;
+import java.util.Collections;
 
 /**
- * Attribute
+ * Attribute of GoodData project dataset
  */
 @JsonTypeName("attribute")
 @JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.NAME)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
-public class Attribute extends Obj implements Queryable {
-
-    private final Content content;
+public class Attribute extends NestedAttribute implements Queryable, Updatable {
 
     @JsonCreator
-    public Attribute(@JsonProperty("meta") Meta meta, @JsonProperty("content") Content content) {
-        super(meta);
-        this.content = content;
+    private Attribute(@JsonProperty("meta") Meta meta, @JsonProperty("content") NestedAttribute.Content content) {
+        super(meta, content);
     }
 
-    public Content getContent() {
-        return content;
+    /* Just for serialization test */
+    Attribute(String title, Key primaryKey, Key foreignKey) {
+        this(new Meta(title),  new Content(asList(primaryKey), asList(foreignKey), Collections.<DisplayForm>emptyList(), null));
     }
-
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
-    public static class Content {
-        private final Collection<Key> pk;
-        private final Collection<Key> fk;
-        private final Collection<DisplayForm> displayForms;
-
-        @JsonCreator
-        public Content(@JsonProperty("pk") Collection<Key> pk, @JsonProperty("fk") Collection<Key> fk,
-                       @JsonProperty("displayForms") Collection<DisplayForm> displayForms) {
-            this.pk = pk;
-            this.fk = fk;
-            this.displayForms = displayForms;
-        }
-
-        public Collection<Key> getPk() {
-            return pk;
-        }
-
-        public Collection<Key> getFk() {
-            return fk;
-        }
-
-        public Collection<DisplayForm> getDisplayForms() {
-            return displayForms;
-        }
-    }
-
 }

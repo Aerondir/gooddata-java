@@ -3,75 +3,93 @@
  */
 package com.gooddata.dataset;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
-/**
- * TODO
- */
+import java.io.InputStream;
+
+import static com.gooddata.JsonMatchers.serializesToJson;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static java.util.Collections.singletonMap;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 public class DatasetManifestTest {
 
-    private static final String SERIALIZED = "{\n"
-            + "   \"dataSetSLIManifest\" : {\n"
-            + "      \"parts\" : [\n"
-            + "         {\n"
-            + "            \"columnName\" : \"f_person.f_shoesize\",\n"
-            + "            \"populates\" : [\n"
-            + "               \"fact.person.shoesize\"\n"
-            + "            ],\n"
-            + "            \"mode\" : \"FULL\"\n"
-            + "         },\n"
-            + "         {\n"
-            + "            \"columnName\" : \"f_person.nm_name\",\n"
-            + "            \"populates\" : [\n"
-            + "               \"attr.person.id.name\"\n"
-            + "            ],\n"
-            + "            \"mode\" : \"FULL\",\n"
-            + "            \"referenceKey\" : 1\n"
-            + "         },\n"
-            + "         {\n"
-            + "            \"columnName\" : \"d_person_role.nm_xrole\",\n"
-            + "            \"populates\" : [\n"
-            + "               \"attr.person.xrole\"\n"
-            + "            ],\n"
-            + "            \"mode\" : \"FULL\",\n"
-            + "            \"referenceKey\" : 1\n"
-            + "         },\n"
-            + "         {\n"
-            + "            \"columnName\" : \"f_person.f_age\",\n"
-            + "            \"populates\" : [\n"
-            + "               \"fact.person.age\"\n"
-            + "            ],\n"
-            + "            \"mode\" : \"FULL\"\n"
-            + "         },\n"
-            + "         {\n"
-            + "            \"columnName\" : \"d_person_department.nm_xdepartment\",\n"
-            + "            \"populates\" : [\n"
-            + "               \"attr.person.xdepartment\"\n"
-            + "            ],\n"
-            + "            \"mode\" : \"FULL\",\n"
-            + "            \"referenceKey\" : 1\n"
-            + "         }\n"
-            + "      ],\n"
-            + "      \"file\" : \"dataset.person.csv\",\n"
-            + "      \"dataSet\" : \"dataset.person\"\n"
-            + "   }\n"
-            + "}\n";
+    @Test
+    public void testDeserialization() throws Exception {
+        final InputStream stream = getClass().getResourceAsStream("/dataset/datasetManifest.json");
+        final DatasetManifest manifest = new ObjectMapper().readValue(stream, DatasetManifest.class);
+
+        assertThat(manifest.getDataSet(), is("dataset.person"));
+        assertThat(manifest.getFile(), is("dataset.person.csv"));
+
+        assertThat(manifest.getParts(), hasSize(3));
+
+        final DatasetManifest.Part lastPart = manifest.getParts().get(2);
+        assertThat(lastPart.getColumnName(), is("d_person_department.nm_xdepartment"));
+        assertThat(lastPart.getUploadMode(), is("FULL"));
+        assertThat(lastPart.isReferenceKey(), is(true));
+        assertThat(lastPart.getPopulates(), hasSize(1));
+        assertThat(lastPart.getPopulates().get(0), is("attr.person.xdepartment"));
+
+        final DatasetManifest.Part datePart = manifest.getParts().get(1);
+        assertThat(datePart.getConstraints().get("date"), is("yyyy-MM-dd'T'HH:mm:ssZ"));
+    }
 
     @Test
-    public void testDeser() throws Exception {
-        final DatasetManifest manifest = new ObjectMapper().readValue(SERIALIZED, DatasetManifest.class);
-        assertEquals("dataset.person", manifest.getDataSet());
-        assertEquals("dataset.person.csv", manifest.getFile());
-        assertEquals(5, manifest.getParts().size());
+    public void testSerialization() throws Exception {
+        final DatasetManifest.Part part = new DatasetManifest.Part("MODE", "COLUMN", singletonList("POPULATES"), true,
+                singletonMap("date", "CONSTRAINT"));
+        final DatasetManifest manifest = new DatasetManifest("DATASET", "FILE", singletonList(part));
 
-        final DatasetManifest.Part part = manifest.getParts().get(4);
-        assertEquals("d_person_department.nm_xdepartment", part.getColumnName());
-        assertArrayEquals(new String[]{"attr.person.xdepartment"}, part.getPopulates().toArray());
-        assertEquals("FULL", part.getUploadMode());
-        assertEquals(Integer.valueOf(1), part.getReferenceKey());
+        assertThat(manifest, serializesToJson("/dataset/datasetManifest-input.json"));
+    }
 
+    @Test
+    public void shouldSetUploadModeForAllParts() throws Exception {
+        final DatasetManifest manifest = new DatasetManifest("dataset", "file.csv", asList(
+                new DatasetManifest.Part("FULL", "col1", asList("attr1"), true, null),
+                new DatasetManifest.Part("FULL", "col2", asList("attr2"), true, null)
+        ));
+        manifest.setUploadMode(UploadMode.INCREMENTAL);
+
+        assertThat(manifest.getParts().get(0).getUploadMode(), is("INCREMENTAL"));
+        assertThat(manifest.getParts().get(1).getUploadMode(), is("INCREMENTAL"));
+    }
+
+    @Test
+    public void shouldSetMapping() throws Exception {
+        final DatasetManifest manifest = new DatasetManifest("dataset", "file.csv", asList(
+                new DatasetManifest.Part("FULL", "col1", asList("attr1"), true, null),
+                new DatasetManifest.Part("FULL", "col2", asList("attr2"), true, null)
+        ));
+        manifest.setMapping("c1", "attr1");
+        manifest.setMapping("c2", "attr2");
+
+        assertThat(manifest.getParts().get(0).getColumnName(), is("c1"));
+        assertThat(manifest.getParts().get(1).getColumnName(), is("c2"));
+    }
+
+    @Test(expectedExceptions = IllegalStateException.class)
+    public void shouldFailOnMultiPopulates() throws Exception {
+        final DatasetManifest manifest = new DatasetManifest("dataset", "file.csv", asList(
+                new DatasetManifest.Part("FULL", "col1", asList("attr1", "attr2"), true, null)
+        ));
+        manifest.setMapping("col", "attr2");
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void shouldFailOnSetSourceNull() {
+        final DatasetManifest manifest = new DatasetManifest("dataset.name");
+        manifest.setSource(null);
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void shouldFailOnSetFileNull() {
+        final DatasetManifest manifest = new DatasetManifest("dataset.name");
+        manifest.setFile(null);
     }
 }

@@ -1,96 +1,38 @@
-# GoodData Java SDK
+# GoodData Java SDK [![Build Status](https://travis-ci.org/martiner/gooddata-java.png?branch=master)](https://travis-ci.org/martiner/gooddata-java)
 
-[![Build Status](https://travis-ci.org/martiner/gooddata-java.png?branch=master)](https://travis-ci.org/martiner/gooddata-java)
+The *GoodData Java SDK* encapsulates the REST API provided by the [GoodData](http://www.gooddata.com) platform.
+The first version was implemented during the [All Data Hackathon](http://hackathon.gooddata.com) April 10 - 11 2014
+and currently the SDK is transitioned to be an official GoodData project.
 
 ## Usage
 
+See [Wiki](https://github.com/martiner/gooddata-java/wiki) for [Code Examples](https://github.com/martiner/gooddata-java/wiki/Code-Examples)
+and [Extensibility How-To](https://github.com/martiner/gooddata-java/wiki/Extending-GoodData-Java-SDK).
+
+The *GoodData Java SDK* is available in Maven Central Repository, to use it from Maven add to `pom.xml`:
+
 ```xml
 <dependency>
-    <groupId>com.gooddata</groupId>
+    <groupId>cz.geek</groupId>
     <artifactId>gooddata-java</artifactId>
-    <version>${gooddata-java.version}</version>
+    <version>0.19.1</version>
 </dependency>
 ```
 
-The *GoodData Java SDK* uses the [GoodData HTTP client](https://github.com/gooddata/gooddata-http-client) (version 0.8.2 or later)
-and the *Apache HTTP Client* (version 4.3 or later).
+See [releases page](https://github.com/martiner/gooddata-java/releases) for information about versions and notable changes.
 
-### General
+### Dependencies
 
-```java
-GoodData gd = new GoodData("roman@gooddata.com", "Roman1");
-gd.logout();
-```
+The *GoodData Java SDK* uses:
+* the [GoodData HTTP client](https://github.com/gooddata/gooddata-http-client) version 0.8.2 or later
+* the *Apache HTTP Client* version 4.3 or later (for white-labeled domains at least version 4.3.2 is required)
+* the *Spring Framework* version 3.x
+* the *Jackson JSON Processor* version 1.9
+* the *Java Development Kit (JDK)* version 7 or later
 
-### Project API
+## License
+The *GoodData Java SDK* is free and open-source software under [BSD License](LICENSE.txt).
 
-List projects, create a project,...
-```java
-ProjectService projectService = gd.getProjectService();
-Collection<Project> projects = projectService.getProjects();
-Project project = projectService.createProject(new Project("my project", "MyToken"));
-```
-
-### Project Model API
-
-Create and update the project model, execute MAQL DDL,...
-
-```java
-ModelService modelService = gd.getModelService();
-ModelDiff diff = modelService.getProjectModelDiff(project, new FileInputStream("model.json");
-modelService.updateProjectModel(project, diff);
-
-modelService.updateProjectModel(project, "MAQL DDL EXPRESSION");
-```
-
-### Metadata API
-
-Query, create and update project metadata - attributes, facts, metrics, reports,...
-
-```java
-MetadataService md = gd.getMetadataService();
-
-String factUri = md.getObjUri(project, Fact.class, Restriction.title("myfact"));
-
-Metric metric = new Metric("my sum", "SELECT SUM([" + factUri + "])", "#,##0");
-Metric m = md.createObj(project, metric);
-
-ReportDefinition definition = GridReportDefinition.create(
-        "my report",
-        asList("metricGroup"),
-        asList(new AttributeItem("/gdc/md/PROJECT_ID/obj/ID")),
-        asList(new Item("/gdc/md/PROJECT_ID/obj/ID"))
-);
-md.createMd(project, definition);
-```
-
-### Dataset API
-
-Upload data to datasets,..
-
-```java
-DatasetService datasetService = gd.getDatasetService();
-datasetService.loadDataset(project, "datasetId", new FileInputStream("data.csv"));
-
-```
-
-### Report API
-
-Execute and export reports.
-
-```java
-ReportService reportService = gd.getReportService();
-String imgUri = reportService.exportReport(reportDef, "png");
-```
-
-### DataStore API
-
-Manage files on the data store (currently backed by WebDAV) - user staging area.
-
-```java
-DataStoreService dataStoreService = gd.getDataStoreService();
-dataStoreService.upload("/dir/file.txt", new FileInputStream("file.txt"));
-InputStream stream = dataStoreService.download("/dir/file.txt");
-dataStoreService.delete("/dir/file.txt");
-
-```
+##Contribute
+Missing functionality? Found a BUG? Please create an [issue](https://github.com/martiner/gooddata-java/issues)
+or simply [contribute your code](CONTRIBUTING.md).

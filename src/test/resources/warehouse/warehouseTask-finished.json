@@ -1,0 +1,9 @@
+{
+    "asyncTask": {
+        "links": {
+            "instance": "/gdc/datawarehouse/instances/instanceId",
+            "user": "user URI",
+            "users": "URI of users in Instance"
+        }
+    }
+}

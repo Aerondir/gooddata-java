@@ -10,32 +10,41 @@ import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import java.util.Collection;
-import java.util.Collections;
 
 /**
+ * Report definition content
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "format")
 @JsonSubTypes({
-        @JsonSubTypes.Type(name = GridReportDefinition.FORMAT, value = GridReportDefinition.class),
-        @JsonSubTypes.Type(name = OneNumberReportDefinition.FORMAT, value = OneNumberReportDefinition.class)
+        @JsonSubTypes.Type(name = GridReportDefinitionContent.FORMAT, value = GridReportDefinitionContent.class),
+        @JsonSubTypes.Type(name = OneNumberReportDefinitionContent.FORMAT,
+                value = OneNumberReportDefinitionContent.class)
+        //TODO chart
 })
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public abstract class ReportDefinitionContent {
 
     private final String format;
-    private final Collection<String> filters = Collections.emptyList();
+    private final Grid grid;
+    private final Collection<Filter> filters;
 
-    public ReportDefinitionContent(String format) {
+    public ReportDefinitionContent(String format, Grid grid, Collection<Filter> filters) {
         this.format = format;
-    }
-
-    public Collection<String> getFilters() {
-        return filters;
+        this.grid = grid;
+        this.filters = filters;
     }
 
     @JsonIgnore // handled by type info
     public String getFormat() {
         return format;
+    }
+
+    public Grid getGrid() {
+        return grid;
+    }
+
+    public Collection<Filter> getFilters() {
+        return filters;
     }
 }

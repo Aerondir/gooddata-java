@@ -9,13 +9,25 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 /**
+ * Service to access and manipulate account.
  */
 public class AccountService extends AbstractService {
 
+    /**
+     * Constructs service for GoodData account management.
+     *
+     * @param restTemplate RESTful HTTP Spring template
+     */
     public AccountService(RestTemplate restTemplate) {
         super(restTemplate);
     }
 
+    /**
+     * Gets current account of logged user.
+     *
+     * @return current account
+     * @throws com.gooddata.GoodDataException when current account can't be accessed.
+     */
     public Account getCurrent() {
         try {
             return restTemplate.getForObject(Account.URI, Account.class, Account.CURRENT_ID);
@@ -24,6 +36,11 @@ public class AccountService extends AbstractService {
         }
     }
 
+    /**
+     * Performs user logout.
+     *
+     * @throws com.gooddata.GoodDataException when logout failed.
+     */
     public void logout() {
         try {
             final String id = getCurrent().getId();

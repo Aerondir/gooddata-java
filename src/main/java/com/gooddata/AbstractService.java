@@ -3,6 +3,10 @@
  */
 package com.gooddata;
 
+import static com.gooddata.util.Validate.notNull;
+import static java.lang.String.format;
+import static org.springframework.http.HttpMethod.GET;
+
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -17,28 +21,27 @@ import org.springframework.web.client.RestTemplate;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
+import java.io.OutputStream;
+import java.util.concurrent.TimeUnit;
 
-import static com.gooddata.Validate.notNull;
-import static java.lang.String.format;
-import static org.springframework.http.HttpMethod.GET;
 
 /**
+ * Parent for GoodData services providing helpers for REST API calls and polling.
  */
 public abstract class AbstractService {
 
-    public static Integer WAIT_BEFORE_RETRY_IN_MILLIS = 5 * 1000;
-    public static Integer MAX_ATTEMPTS = 5;
+    public static final Integer WAIT_BEFORE_RETRY_IN_MILLIS = 5 * 1000;
 
     protected final RestTemplate restTemplate;
 
     protected final ObjectMapper mapper = new ObjectMapper();
 
-    private final RequestCallback noopRequestCallback = new RequestCallback() {
+    protected final RequestCallback noopRequestCallback = new RequestCallback() {
         @Override
         public void doWithRequest(final ClientHttpRequest request) throws IOException {
         }
     };
+
     private final ResponseExtractor<ClientHttpResponse> reusableResponseExtractor = new ResponseExtractor<ClientHttpResponse>() {
         @Override
         public ClientHttpResponse extractData(final ClientHttpResponse response) throws IOException {
@@ -47,76 +50,72 @@ public abstract class AbstractService {
     };
 
 
+    /**
+     * Sets RESTful HTTP Spring template. Should be called from constructor of concrete service extending
+     * this abstract one.
+     *
+     * @param restTemplate RESTful HTTP Spring template
+     */
     public AbstractService(RestTemplate restTemplate) {
         this.restTemplate = notNull(restTemplate, "restTemplate");
     }
 
-    public <T> T poll(URI pollingUri, Class<T> cls) {
-        return poll(pollingUri, new StatusOkConditionCallback(), cls);
-    }
-
-    public <T> T poll(String pollingUri, Class<T> cls) {
-        return poll(URI.create(pollingUri), new StatusOkConditionCallback(), cls);
-    }
-
-    public <T> T poll(String pollingUri, ConditionCallback condition, Class<T> returnClass) {
-        return poll(URI.create(pollingUri), condition, returnClass);
-    }
-
-    public <T> T poll(URI pollingUri, ConditionCallback condition, Class<T> returnClass) {
-        int attempt = 0;
-
+    final <R> R poll(final PollHandler<?,R> handler, long timeout, final TimeUnit unit) {
+        notNull(handler, "handler");
+        final long start = System.currentTimeMillis();
         while (true) {
-
-            final ClientHttpResponse response = restTemplate.execute(pollingUri, GET, noopRequestCallback,
-                    reusableResponseExtractor);
-
-            try {
-                if (condition.finished(response)) {
-                    return new HttpMessageConverterExtractor<>(returnClass, restTemplate.getMessageConverters())
-                            .extractData(response);
-                } else if (HttpStatus.Series.CLIENT_ERROR.equals(response.getStatusCode().series())) {
-                    throw new GoodDataException(
-                            format("Polling returned client error HTTP status %s", response.getStatusCode().value())
-                    );
-                }
-            } catch (IOException e) {
-                throw new GoodDataException("I/O error occurred during HTTP response extraction", e);
+            if (pollOnce(handler)) {
+                return handler.getResult();
             }
-
-            if (attempt >= MAX_ATTEMPTS - 1) {
-                throw new GoodDataException(format("Max number of attempts (%s) exceeded", MAX_ATTEMPTS));
+            if (unit != null && start + unit.toMillis(timeout) > System.currentTimeMillis()) {
+                throw new GoodDataException("timeout");
             }
 
             try {
                 Thread.sleep(WAIT_BEFORE_RETRY_IN_MILLIS);
             } catch (InterruptedException e) {
-                // do nothing
+                throw new GoodDataException("interrupted");
             }
-            attempt++;
         }
     }
 
-    protected <T> T extractData(ClientHttpResponse response, Class<T> cls) throws IOException {
+    final <P> boolean pollOnce(final PollHandler<P,?> handler) {
+        notNull(handler, "handler");
+        final ClientHttpResponse response;
+        try {
+            response = restTemplate.execute(handler.getPollingUri(), GET, noopRequestCallback, reusableResponseExtractor);
+        } catch (GoodDataRestException e) {
+            handler.handlePollException(e);
+            throw new GoodDataException("Handler " + handler.getClass().getName() + " didn't handle exception", e);
+        }
+
+        try {
+            if (handler.isFinished(response)) {
+                final P data = extractData(response, handler.getPollClass());
+                handler.handlePollResult(data);
+            } else if (HttpStatus.Series.CLIENT_ERROR.equals(response.getStatusCode().series())) {
+                throw new GoodDataException(
+                        format("Polling returned client error HTTP status %s", response.getStatusCode().value())
+                );
+            }
+        } catch (IOException e) {
+            throw new GoodDataException("I/O error occurred during HTTP response extraction", e);
+        }
+        return handler.isDone();
+    }
+
+    protected final <T> T extractData(ClientHttpResponse response, Class<T> cls) throws IOException {
+        notNull(response, "response");
+        notNull(cls, "cls");
+        if (Void.class.isAssignableFrom(cls)) {
+            return null;
+        }
         return new HttpMessageConverterExtractor<>(cls, restTemplate.getMessageConverters()).extractData(response);
     }
 
+    private static class ReusableClientHttpResponse implements ClientHttpResponse {
 
-    public static interface ConditionCallback {
-        boolean finished(ClientHttpResponse response) throws IOException;
-    }
-
-    public static class StatusOkConditionCallback implements ConditionCallback {
-        @Override
-        public boolean finished(ClientHttpResponse response) throws IOException {
-            return HttpStatus.OK.equals(response.getStatusCode());
-        }
-    }
-
-
-    private class ReusableClientHttpResponse implements ClientHttpResponse {
-
-        private final byte[] body;
+        private byte[] body;
         private final HttpStatus statusCode;
         private final int rawStatusCode;
         private final String statusText;
@@ -124,7 +123,10 @@ public abstract class AbstractService {
 
         public ReusableClientHttpResponse(ClientHttpResponse response) {
             try {
-                body = FileCopyUtils.copyToByteArray(response.getBody());
+                final InputStream bodyStream = response.getBody();
+                if (bodyStream != null) {
+                    body = FileCopyUtils.copyToByteArray(bodyStream);
+                }
                 statusCode = response.getStatusCode();
                 rawStatusCode = response.getRawStatusCode();
                 statusText = response.getStatusText();
@@ -160,12 +162,25 @@ public abstract class AbstractService {
 
         @Override
         public InputStream getBody() throws IOException {
-            return new ByteArrayInputStream(body);
+            return body != null ? new ByteArrayInputStream(body) : null;
         }
 
         @Override
         public void close() {
             //already closed
+        }
+    }
+
+    protected static class OutputStreamResponseExtractor implements ResponseExtractor<Integer> {
+        private final OutputStream output;
+
+        public OutputStreamResponseExtractor(OutputStream output) {
+            this.output = output;
+        }
+
+        @Override
+        public Integer extractData(ClientHttpResponse response) throws IOException {
+            return FileCopyUtils.copy(response.getBody(), output);
         }
     }
 

@@ -3,16 +3,18 @@
  */
 package com.gooddata.model;
 
-
-import static org.junit.Assert.assertEquals;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.junit.Test;
+import org.testng.annotations.Test;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 public class MaqlDdlTest {
 
     @Test
-    public void testSer() throws Exception {
-        assertEquals("{\"manage\":{\"maql\":\"maqlddl\"}}", new ObjectMapper().writeValueAsString(new MaqlDdl("maqlddl")));
+    public void testSerialization() throws Exception {
+        assertThat(new ObjectMapper().writeValueAsString(new MaqlDdl("maqlddl")),
+                is("{\"manage\":{\"maql\":\"maqlddl\"}}"));
 
     }
 }
