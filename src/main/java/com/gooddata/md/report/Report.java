@@ -3,17 +3,16 @@
  */
 package com.gooddata.md.report;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.gooddata.md.AbstractObj;
 import com.gooddata.md.Meta;
 import com.gooddata.md.Queryable;
 import com.gooddata.md.Updatable;
-import org.codehaus.jackson.annotate.JsonCreator;
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.annotate.JsonTypeName;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import java.util.Collection;
 
@@ -24,8 +23,7 @@ import static java.util.Arrays.asList;
  */
 @JsonTypeName("report")
 @JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.NAME)
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Report extends AbstractObj implements Queryable, Updatable {
 
     @JsonProperty("content")
@@ -57,8 +55,7 @@ public class Report extends AbstractObj implements Queryable, Updatable {
         return content.getDomains();
     }
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private static class Content {
         private final Collection<String> definitions;
         private final Collection<String> domains;

@@ -3,29 +3,31 @@
  */
 package com.gooddata.md;
 
-import com.gooddata.util.BooleanIntegerDeserializer;
-import com.gooddata.util.BooleanIntegerSerializer;
-import org.codehaus.jackson.annotate.JsonCreator;
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.map.annotate.JsonDeserialize;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Display form
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class DisplayForm extends AbstractObj {
 
     @JsonProperty("content")
     protected final Content content;
 
+    @JsonProperty("links")
+    private final Links links;
+
     @JsonCreator
-    protected DisplayForm(@JsonProperty("meta") Meta meta, @JsonProperty("content") Content content) {
+    protected DisplayForm(@JsonProperty("meta") Meta meta, @JsonProperty("content") Content content,
+            @JsonProperty("links") Links links) {
         super(meta);
         this.content = content;
+        this.links = links;
     }
 
     @JsonIgnore
@@ -48,8 +50,13 @@ public class DisplayForm extends AbstractObj {
         return content.getType();
     }
 
+    @JsonIgnore
+    public String getElementsLink() {
+        return links.getElements();
+    }
+
     @JsonIgnoreProperties(ignoreUnknown = true)
-    @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     protected static class Content {
 
         private final String formOf;
@@ -81,6 +88,20 @@ public class DisplayForm extends AbstractObj {
 
         public String getType() {
             return type;
+        }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    protected static class Links {
+        private final String elements;
+
+        @JsonCreator
+        protected Links(@JsonProperty("elements") String elements) {
+            this.elements = elements;
+        }
+
+        public String getElements() {
+            return elements;
         }
     }
 

@@ -3,11 +3,11 @@
  */
 package com.gooddata.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.gooddata.gdc.LinkEntries;
-import org.codehaus.jackson.annotate.JsonCreator;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
@@ -16,7 +16,7 @@ import java.util.List;
  * Deserialization only.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 class MaqlDdlLinks extends LinkEntries {
 
     private static final String TASKS_STATUS = "tasks-status";

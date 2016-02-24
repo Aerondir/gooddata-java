@@ -1,18 +1,17 @@
 package com.gooddata.warehouse;
 
-import org.codehaus.jackson.annotate.JsonCreator;
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.annotate.JsonTypeName;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import org.springframework.web.util.UriTemplate;
 
 import java.util.Map;
 
 import static com.gooddata.util.Validate.notNull;
-import static org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion.NON_NULL;
 
 /**
  * Warehouse user
@@ -20,11 +19,13 @@ import static org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion.NON_NULL
 @JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.NAME)
 @JsonTypeName("user")
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonSerialize(include = NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class WarehouseUser {
 
     public static final String URI = WarehouseUsers.URI + "/{userId}";
     public static final UriTemplate TEMPLATE = new UriTemplate(URI);
+    public static final String ADMIN_ROLE = "admin";
+    public static final String DATA_ADMIN_ROLE = "dataAdmin";
 
     private static final String SELF_LINK = "self";
 

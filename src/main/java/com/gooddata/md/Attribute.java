@@ -5,12 +5,11 @@ package com.gooddata.md;
 
 import static java.util.Arrays.asList;
 
-import org.codehaus.jackson.annotate.JsonCreator;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.annotate.JsonTypeName;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import java.util.Collections;
 
@@ -19,8 +18,7 @@ import java.util.Collections;
  */
 @JsonTypeName("attribute")
 @JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.NAME)
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Attribute extends NestedAttribute implements Queryable, Updatable {
 
     @JsonCreator
@@ -30,6 +28,7 @@ public class Attribute extends NestedAttribute implements Queryable, Updatable {
 
     /* Just for serialization test */
     Attribute(String title, Key primaryKey, Key foreignKey) {
-        this(new Meta(title),  new Content(asList(primaryKey), asList(foreignKey), Collections.<DisplayForm>emptyList(), null));
+        this(new Meta(title),  new Content(asList(primaryKey), asList(foreignKey), Collections.<DisplayForm>emptyList(), null, null, null, null, null,
+                null, null, null, null, null, null));
     }
 }

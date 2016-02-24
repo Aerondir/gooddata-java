@@ -1,18 +1,20 @@
 package com.gooddata.md;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.gooddata.util.*;
-import org.codehaus.jackson.annotate.JsonCreator;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.map.annotate.JsonDeserialize;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.joda.time.DateTime;
 
 /**
  * Metadata entry (can be named "LINK" in some API docs)
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Entry {
 
     private final String link;
@@ -21,13 +23,13 @@ public class Entry {
     private final String category;
     private final String author;
     private final String contributor;
-    private final boolean deprecated;
+    private final Boolean deprecated;
     private final String identifier;
     private final String tags; //TODO collection
     private final DateTime created;
     private final DateTime updated;
-    private final boolean locked;
-    private final boolean unlisted;
+    private final Boolean locked;
+    private final Boolean unlisted;
 
     @JsonCreator
     public Entry(@JsonProperty("link") String link,
@@ -36,13 +38,13 @@ public class Entry {
                  @JsonProperty("category") String category,
                  @JsonProperty("author") String author,
                  @JsonProperty("contributor") String contributor,
-                 @JsonProperty("deprecated") @JsonDeserialize(using = BooleanStringDeserializer.class) boolean deprecated,
+                 @JsonProperty("deprecated") @JsonDeserialize(using = BooleanStringDeserializer.class) Boolean deprecated,
                  @JsonProperty("identifier") String identifier,
                  @JsonProperty("tags") String tags,
                  @JsonProperty("created") @JsonDeserialize(using = GDDateTimeDeserializer.class) DateTime created,
                  @JsonProperty("updated") @JsonDeserialize(using = GDDateTimeDeserializer.class) DateTime updated,
-                 @JsonProperty("locked") @JsonDeserialize(using = BooleanIntegerDeserializer.class) boolean locked,
-                 @JsonProperty("unlisted") @JsonDeserialize(using = BooleanIntegerDeserializer.class) boolean unlisted) {
+                 @JsonProperty("locked") @JsonDeserialize(using = BooleanIntegerDeserializer.class) Boolean locked,
+                 @JsonProperty("unlisted") @JsonDeserialize(using = BooleanIntegerDeserializer.class) Boolean unlisted) {
         this.link = link;
         this.title = title;
         this.summary = summary;
@@ -82,8 +84,16 @@ public class Entry {
         return contributor;
     }
 
-    @JsonSerialize(using = BooleanStringSerializer.class)
+    /**
+     * @return true if the deprecated is set and is true
+     */
+    @JsonIgnore
     public boolean isDeprecated() {
+        return Boolean.TRUE.equals(deprecated);
+    }
+
+    @JsonSerialize(using = BooleanStringSerializer.class)
+    public Boolean getDeprecated() {
         return deprecated;
     }
 
@@ -105,13 +115,29 @@ public class Entry {
         return updated;
     }
 
-	@JsonSerialize(using = BooleanIntegerSerializer.class)
+    /**
+     * @return true if the locked is set and is true
+     */
+    @JsonIgnore
     public boolean isLocked() {
+        return Boolean.TRUE.equals(locked);
+    }
+
+    @JsonSerialize(using = BooleanIntegerSerializer.class)
+    public Boolean getLocked() {
         return locked;
     }
 
-	@JsonSerialize(using = BooleanIntegerSerializer.class)
+    /**
+     * @return true if the unlisted is set and is true
+     */
+    @JsonIgnore
     public boolean isUnlisted() {
+        return Boolean.TRUE.equals(unlisted);
+    }
+
+    @JsonSerialize(using = BooleanIntegerSerializer.class)
+    public Boolean getUnlisted() {
         return unlisted;
     }
 }

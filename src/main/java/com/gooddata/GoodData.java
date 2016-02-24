@@ -6,6 +6,7 @@ package com.gooddata;
 import com.gooddata.account.AccountService;
 import com.gooddata.connector.ConnectorService;
 import com.gooddata.dataload.processes.ProcessService;
+import com.gooddata.notification.NotificationService;
 import com.gooddata.util.ResponseErrorHandler;
 import com.gooddata.warehouse.WarehouseService;
 import com.gooddata.dataset.DatasetService;
@@ -27,17 +28,9 @@ import org.apache.http.util.VersionInfo;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.http.converter.ByteArrayHttpMessageConverter;
-import org.springframework.http.converter.FormHttpMessageConverter;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.ResourceHttpMessageConverter;
-import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import static com.gooddata.util.Validate.notEmpty;
 import static java.util.Collections.singletonMap;
@@ -79,6 +72,7 @@ public class GoodData {
     private final ConnectorService connectorService;
     private final ProcessService processService;
     private final WarehouseService warehouseService;
+    private final NotificationService notificationService;
 
     /**
      * Create instance configured to communicate with GoodData Platform under user with given credentials.
@@ -165,59 +159,41 @@ public class GoodData {
      * @param password GoodData user's password
      * @param port     GoodData Platform's API port (e.g. 443)
      * @param protocol GoodData Platform's API protocol (e.g. https)
+     * @param settings additional settings
      */
     protected GoodData(String hostname, String login, String password, int port, String protocol, GoodDataSettings settings) {
         notEmpty(hostname, "hostname");
         notEmpty(login, "login");
         notEmpty(password, "password");
         notEmpty(protocol, "protocol");
-        final HttpClientBuilder httpClientBuilder = createHttpClientBuilder(settings);
+        final HttpClient httpClient = createHttpClient(login, password, hostname, port, protocol,
+                createHttpClientBuilder(settings));
 
-        restTemplate = createRestTemplate(login, password, hostname, httpClientBuilder, port, protocol);
+        restTemplate = createRestTemplate(hostname, httpClient, port, protocol);
 
         accountService = new AccountService(getRestTemplate());
         projectService = new ProjectService(getRestTemplate(), accountService);
         metadataService = new MetadataService(getRestTemplate());
         modelService = new ModelService(getRestTemplate());
         gdcService = new GdcService(getRestTemplate());
-        dataStoreService = new DataStoreService(httpClientBuilder, gdcService, new HttpHost(hostname, port, protocol).toURI(), login, password);
+        dataStoreService = new DataStoreService(httpClient, getRestTemplate(), gdcService, new HttpHost(hostname, port, protocol).toURI());
         datasetService = new DatasetService(getRestTemplate(), dataStoreService);
         reportService = new ReportService(getRestTemplate());
         processService = new ProcessService(getRestTemplate(), accountService, dataStoreService);
-        warehouseService = new WarehouseService(getRestTemplate(), hostname, port);
+        warehouseService = new WarehouseService(getRestTemplate());
         connectorService = new ConnectorService(getRestTemplate(), projectService);
+        notificationService = new NotificationService(getRestTemplate());
     }
 
-    private RestTemplate createRestTemplate(String login, String password, String hostname, HttpClientBuilder builder,
-                                            int port, String protocol) {
-        final HttpClient client = createHttpClient(login, password, hostname, port, protocol, builder);
+    private RestTemplate createRestTemplate(String hostname, HttpClient httpClient, int port, String protocol) {
 
         final UriPrefixingClientHttpRequestFactory factory = new UriPrefixingClientHttpRequestFactory(
-                new HttpComponentsClientHttpRequestFactory(client), hostname, port, protocol);
+                new HttpComponentsClientHttpRequestFactory(httpClient), hostname, port, protocol);
         final RestTemplate restTemplate = new RestTemplate(factory);
         restTemplate.setInterceptors(Arrays.<ClientHttpRequestInterceptor>asList(
                 new HeaderSettingRequestInterceptor(singletonMap("Accept", getAcceptHeaderValue()))));
 
-        // avoid jackson2 auto-detection and ensure jackson1 converter is present
-        final List<HttpMessageConverter<?>> partConverters = new ArrayList<>();
-        partConverters.add(new ByteArrayHttpMessageConverter());
-        final StringHttpMessageConverter stringHttpMessageConverter = new StringHttpMessageConverter();
-        stringHttpMessageConverter.setWriteAcceptCharset(false);
-        partConverters.add(stringHttpMessageConverter);
-        partConverters.add(new ResourceHttpMessageConverter());
-        partConverters.add(new MappingJacksonHttpMessageConverter());
-        final FormHttpMessageConverter formHttpMessageConverter = new FormHttpMessageConverter();
-        formHttpMessageConverter.setPartConverters(partConverters);
-
-        final List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
-        messageConverters.add(new ByteArrayHttpMessageConverter());
-        messageConverters.add(new StringHttpMessageConverter());
-        messageConverters.add(new ResourceHttpMessageConverter());
-        messageConverters.add(formHttpMessageConverter);
-        messageConverters.add(new MappingJacksonHttpMessageConverter());
-        restTemplate.setMessageConverters(messageConverters);
-
-        restTemplate.setErrorHandler(new ResponseErrorHandler(messageConverters));
+        restTemplate.setErrorHandler(new ResponseErrorHandler(restTemplate.getMessageConverters()));
 
         return restTemplate;
     }
@@ -381,5 +357,14 @@ public class GoodData {
      */
     public ConnectorService getConnectorService() {
         return connectorService;
+    }
+
+    /**
+     * Get initialized service for project notifications management.
+     *
+     * @return initialized service for project notifications management
+     */
+    public NotificationService getNotificationService() {
+        return notificationService;
     }
 }

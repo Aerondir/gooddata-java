@@ -1,9 +1,12 @@
 package com.gooddata.util;
 
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.map.DeserializationContext;
-import org.codehaus.jackson.map.JsonDeserializer;
+import static com.gooddata.util.Validate.notNull;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonMappingException;
 
 import java.io.IOException;
 
@@ -15,7 +18,12 @@ public class BooleanStringDeserializer extends JsonDeserializer<Boolean> {
     @Override
     public Boolean deserialize(JsonParser jp, DeserializationContext ctx) throws IOException {
         final JsonNode root = jp.readValueAsTree();
-        return root != null && "1".equals(root.getTextValue());
+        notNull(root, "jsonNode");
+        if (root.isTextual()) {
+            return "1".equals(root.textValue());
+        } else {
+            throw new JsonMappingException("Expected textual value: " + root.asText(), jp.getCurrentLocation());
+        }
     }
 
 }

@@ -3,25 +3,23 @@
  */
 package com.gooddata.md;
 
-import org.codehaus.jackson.annotate.JsonCreator;
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.annotate.JsonTypeName;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import java.util.Collection;
 
-import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 
 /**
  * Fact of GoodData project dataset
  */
 @JsonTypeName("fact")
 @JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.NAME)
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Fact extends AbstractObj implements Queryable, Updatable {
 
     @JsonProperty("content")
@@ -34,9 +32,9 @@ public class Fact extends AbstractObj implements Queryable, Updatable {
     }
 
     /* Just for serialization test */
-    Fact(String title, String data, String type) {
+    Fact(String title, String data, String type, String folder) {
         super(new Meta(title));
-        content = new Content(asList(new Expression(data, type)));
+        content = new Content(singletonList(new Expression(data, type)), singletonList(folder));
     }
 
     @JsonIgnore
@@ -44,19 +42,32 @@ public class Fact extends AbstractObj implements Queryable, Updatable {
         return content.getExpression();
     }
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonIgnore
+    public Collection<String> getFolders() {
+        return content.getFolders();
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private static class Content {
 
         @JsonProperty("expr")
         private final Collection<Expression> expression;
 
+        @JsonProperty("folders")
+        private final Collection<String> folders;
+
         @JsonCreator
-        public Content(@JsonProperty("expr") Collection<Expression> expression) {
+        public Content(@JsonProperty("expr") Collection<Expression> expression, @JsonProperty("folders") Collection<String> folders) {
             this.expression = expression;
+            this.folders = folders;
         }
 
         public Collection<Expression> getExpression() {
             return expression;
+        }
+
+        public Collection<String> getFolders() {
+            return folders;
         }
     }
 }

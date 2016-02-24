@@ -3,8 +3,8 @@
  */
 package com.gooddata.md;
 
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.testng.annotations.Test;
@@ -56,8 +56,8 @@ public class ObjTest {
     @Test
     public void testSerialization() throws Exception {
         final ConcreteObj obj = new ConcreteObj(
-                new Meta(AUTHOR, CONTRIBUTOR, CREATED, UPDATED, SUMMARY, TITLE, CATEGORY, TAGS, URI, DEPRECATED,
-                        IDENTIFIER, LOCKED, UNLISTED)
+                new Meta(AUTHOR, CONTRIBUTOR, CREATED, UPDATED, SUMMARY, TITLE, CATEGORY, TAGS, URI, IDENTIFIER,
+                        DEPRECATED, null, LOCKED, UNLISTED, null)
         );
 
         assertThat(obj, serializesToJson("/md/objCommon.json"));

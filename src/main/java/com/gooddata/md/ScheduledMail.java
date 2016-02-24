@@ -3,16 +3,14 @@
  */
 package com.gooddata.md;
 
-import com.gooddata.md.report.Report;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.gooddata.md.report.ReportDefinition;
 import com.gooddata.report.ReportExportFormat;
-import org.codehaus.jackson.annotate.JsonCreator;
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.annotate.JsonTypeName;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import org.joda.time.LocalDate;
 
 import java.util.*;
@@ -25,8 +23,7 @@ import static com.gooddata.util.Validate.notNull;
  */
 @JsonTypeName("scheduledMail")
 @JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.NAME)
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ScheduledMail extends AbstractObj implements Queryable, Updatable {
 
     @JsonProperty("content")
@@ -40,7 +37,7 @@ public class ScheduledMail extends AbstractObj implements Queryable, Updatable {
 
     private ScheduledMail(String title, String summary, String tags, boolean deprecated, String recurrency, LocalDate startDate, String timeZone,
                   Collection<String> toAddresses, Collection<String> bccAddresses, String subject, String body, List<Attachment> attachments) {
-        super(new Meta(null, null, null, null, summary, title, null, tags, null, deprecated, null, false, false));
+        super(new Meta(null, null, null, null, summary, title, null, tags, null, null, deprecated, null, false, false, null));
         notNull(toAddresses, "toAddresses");
         notNull(subject, "subject");
         notNull(body, "body");
@@ -55,7 +52,7 @@ public class ScheduledMail extends AbstractObj implements Queryable, Updatable {
      * @param summary the summary of the MD object
      */
     public ScheduledMail(String title, String summary) {
-        super(new Meta(null, null, null, null, summary, title, null, "", null, false, null, false, false));
+        super(new Meta(null, null, null, null, summary, title, null, "", null, null, false, null, false, false, null));
         this.content = new Content();
     }
 
@@ -82,7 +79,6 @@ public class ScheduledMail extends AbstractObj implements Queryable, Updatable {
     /**
      * Mail schedule MD object payload.
      */
-    @JsonIgnoreProperties(ignoreUnknown = true)
     private static class Content {
 
         @JsonProperty("when")

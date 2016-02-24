@@ -4,8 +4,8 @@
 package com.gooddata.md;
 
 import com.gooddata.report.ReportExportFormat;
-import org.codehaus.jackson.annotate.JsonCreator;
-import org.codehaus.jackson.annotate.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -94,7 +94,7 @@ public class ReportAttachment extends Attachment {
      *   </li>
      * </ul>
      *
-     * @return
+     * @return map of export options
      */
     public Map<String, String> getExportOptions() { return exportOptions; }
 

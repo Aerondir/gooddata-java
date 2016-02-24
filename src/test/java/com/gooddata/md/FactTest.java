@@ -3,7 +3,7 @@
  */
 package com.gooddata.md;
 
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.testng.annotations.Test;
 
 import static com.gooddata.JsonMatchers.serializesToJson;
@@ -20,11 +20,13 @@ public class FactTest {
         assertThat(fact, is(notNullValue()));
         assertThat(fact.getExpressions(), is(notNullValue()));
         assertThat(fact.getExpressions(), hasSize(1));
+        assertThat(fact.getFolders(), is(notNullValue()));
+        assertThat(fact.getFolders(), hasSize(2));
     }
 
     @Test
     public void testSerialization() throws Exception {
-        final Fact fact = new Fact("Person Shoe Size", "/gdc/md/PROJECT_ID/obj/COL_ID", "col");
+        final Fact fact = new Fact("Person Shoe Size", "/gdc/md/PROJECT_ID/obj/COL_ID", "col", "/gdc/md/PROJECT_ID/obj/FOLDER_ID");
         assertThat(fact, serializesToJson("/md/fact-input.json"));
     }
 

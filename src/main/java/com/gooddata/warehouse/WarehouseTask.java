@@ -1,10 +1,10 @@
 package com.gooddata.warehouse;
 
-import org.codehaus.jackson.annotate.JsonCreator;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.annotate.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import java.util.Map;
 
@@ -18,6 +18,7 @@ class WarehouseTask {
 
     private static final String POLL_LINK = "poll";
     private static final String WAREHOUSE_LINK = "instance";
+    private static final String WAREHOUSE_USER_LINK = "user";
 
     private final Map<String,String> links;
 
@@ -32,5 +33,9 @@ class WarehouseTask {
 
     String getWarehouseLink() {
         return links.get(WAREHOUSE_LINK);
+    }
+
+    String getWarehouseUserLink() {
+        return links.get(WAREHOUSE_USER_LINK);
     }
 }

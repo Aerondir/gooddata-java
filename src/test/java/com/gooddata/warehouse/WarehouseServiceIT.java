@@ -29,8 +29,12 @@ public class WarehouseServiceIT extends AbstractGoodDataIT {
     private static final String TASK_DONE = "/warehouse/warehouseTask-finished.json";
     private static final String WAREHOUSE_ID = "instanceId";
     private static final String WAREHOUSE = "/warehouse/warehouse.json";
+    private static final String WAREHOUSE_USER = "/warehouse/user.json";
 
     private static final String WAREHOUSE_URI = Warehouse.TEMPLATE.expand(WAREHOUSE_ID).toString();
+    private static final String WAREHOUSE_USER_URI = WarehouseUsers.TEMPLATE.expand(WAREHOUSE_ID).toString();
+
+    private static final String CONNECTION_URL = "CONNECTION_URL";
 
     private WarehouseTask pollingTask;
     private WarehouseTask finishedTask;
@@ -69,7 +73,7 @@ public class WarehouseServiceIT extends AbstractGoodDataIT {
         final Warehouse created = gd.getWarehouseService().createWarehouse(new Warehouse(TITLE, "{Token}", "Storage")).get();
         assertThat(created, notNullValue());
         assertThat(created.getTitle(), is(TITLE));
-        assertThat(created.getJdbcConnectionString(), is("jdbc:gdc:datawarehouse://localhost:" + port() + WAREHOUSE_URI));
+        assertThat(created.getConnectionUrl(), is(CONNECTION_URL));
     }
 
     @Test(expectedExceptions = GoodDataException.class)
@@ -101,6 +105,8 @@ public class WarehouseServiceIT extends AbstractGoodDataIT {
         final PageableList<Warehouse> list = gd.getWarehouseService().listWarehouses();
         assertThat(list, notNullValue());
         assertThat(list, hasSize(2));
+        assertThat(list.get(0).getConnectionUrl(), notNullValue());
+        assertThat(list.get(1).getConnectionUrl(), notNullValue());
     }
 
     @Test
@@ -126,6 +132,7 @@ public class WarehouseServiceIT extends AbstractGoodDataIT {
         final Warehouse warehouse = gd.getWarehouseService().getWarehouseById(WAREHOUSE_ID);
         assertThat(warehouse, notNullValue());
         assertThat(warehouse.getTitle(), is(TITLE));
+        assertThat(warehouse.getConnectionUrl(), notNullValue());
     }
 
     @Test
@@ -187,4 +194,53 @@ public class WarehouseServiceIT extends AbstractGoodDataIT {
         final PageableList<WarehouseUser> users = gd.getWarehouseService().listWarehouseUsers(warehouse, new PageRequest(2));
         assertThat(users, Matchers.hasSize(2));
     }
+
+    @Test
+    public void shouldAddUserToWarehouse() throws Exception {
+        onRequest()
+                .havingMethodEqualTo("POST")
+                .havingPathEqualTo(WAREHOUSE_USER_URI)
+                .respond()
+                .withBody(readFromResource(TASK_POLL))
+                .withStatus(202);
+        onRequest()
+                .havingMethodEqualTo("GET")
+                .havingPathEqualTo(pollingTask.getPollLink())
+                .respond()
+                .withStatus(202)
+                .thenRespond()
+                .withBody(readFromResource(TASK_DONE))
+                .withStatus(201);
+        onRequest()
+                .havingMethodEqualTo("GET")
+                .havingPathEqualTo(finishedTask.getWarehouseUserLink())
+                .respond()
+                .withBody(readFromResource(WAREHOUSE_USER))
+                .withStatus(200);
+
+        final WarehouseUser created = gd.getWarehouseService().addUserToWarehouse(
+                warehouse, new WarehouseUser("role", "profile", null)).get();
+        assertThat(created, notNullValue());
+        assertThat(created.getRole(), is("admin"));
+        assertThat(created.getLogin(), is("foo@bar.com"));
+        assertThat(created.getProfile(), is("/gdc/account/profile/{profile-id}"));
+    }
+
+    @Test(expectedExceptions = GoodDataException.class)
+    public void shouldFailToAddUserToWarehouse() throws Exception {
+        onRequest()
+                .havingMethodEqualTo("POST")
+                .havingPathEqualTo(WAREHOUSE_USER_URI)
+                .respond()
+                .withBody(readFromResource(TASK_POLL))
+                .withStatus(202);
+        onRequest()
+                .havingMethodEqualTo("GET")
+                .havingPathEqualTo(pollingTask.getPollLink())
+                .respond()
+                .withStatus(409);
+
+        gd.getWarehouseService().addUserToWarehouse(warehouse, new WarehouseUser("role", "profile", null)).get();
+    }
+
 }

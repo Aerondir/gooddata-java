@@ -7,7 +7,7 @@ import static com.gooddata.util.Validate.notNull;
 import static java.lang.String.format;
 import static org.springframework.http.HttpMethod.GET;
 
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpRequest;
@@ -67,7 +67,7 @@ public abstract class AbstractService {
             if (pollOnce(handler)) {
                 return handler.getResult();
             }
-            if (unit != null && start + unit.toMillis(timeout) > System.currentTimeMillis()) {
+            if (unit != null && start + unit.toMillis(timeout) < System.currentTimeMillis()) {
                 throw new GoodDataException("timeout");
             }
 

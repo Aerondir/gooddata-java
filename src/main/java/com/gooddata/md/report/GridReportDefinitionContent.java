@@ -3,11 +3,10 @@
  */
 package com.gooddata.md.report;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.gooddata.md.Meta;
-import org.codehaus.jackson.annotate.JsonCreator;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -16,8 +15,7 @@ import java.util.List;
 /**
  * Grid report definition
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class GridReportDefinitionContent extends ReportDefinitionContent {
 
     public static final String FORMAT = "grid";
